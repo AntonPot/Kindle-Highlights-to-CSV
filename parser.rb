@@ -1,8 +1,8 @@
 require 'kindle_highlights'
+require 'htmlentities'
 require 'csv'
 
 module Parser
-
   class Kindle
     attr_reader :books, :data
     def initialize(email, password)
@@ -11,18 +11,24 @@ module Parser
     end
 
     class Highlight
-      attr_accessor :data
-      def initialize(data)
-        @data = data
+      attr_accessor :highlight_data
+      def initialize(highlight_data)
+        @highlight_data = highlight_data
       end
       def add_title(title)
-        @data.merge('title' => title)
+        @highlight_data.merge('title' => title)
+      end
+      def translate_html_entities
+        translater = HTMLEntities.new
+        @highlight_data['highlight'] = translater.decode(@highlight_data['highlight'])
       end
     end
 
     def full_book_info(id, title)
       @data.highlights_for(id).map do |highlight|
-        Highlight.new(highlight).add_title(title)
+        hl = Highlight.new(highlight)
+        hl.translate_html_entities
+        hl.add_title(title)
       end
     end
 

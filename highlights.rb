@@ -9,12 +9,9 @@ get '/' do
 end
 
 post '/form' do
-  # filename = 'kindle_highlights.csv'
-  filename = 'kindle_highlights_hash'
+  filename = 'kindle_highlights.csv'
   data = Parser::Kindle.new(params[:email], params[:password]).books_highlights
-  p data
-  File.open(filename, "w") { |file| file.write(data) }
-  # Parser::CsvGenerator.go( data, filename )
+  Parser::CsvGenerator.go( data, filename )
   redirect "/download/#{filename}"
 end
 
